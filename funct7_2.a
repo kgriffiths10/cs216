@@ -1,0 +1,164 @@
+#/*# Start of file funct7.a */
+#
+#/*# MIPSMARK 1.0 1/5/98 Copyright 1998 J. Waldron. */
+#
+## Question:
+##
+## Write a function "strchk" that returns
+## the number of characters in a string $a0
+## that return a 1 when passed to the
+## "checkch" function. 
+## Otherwise checkch returns 0.
+## do not rely on the label "str" or the 
+## particular implementation of "checkch"
+## 
+
+#/*# Output format must be:		*/
+#/*# "number of characters that pass test = 8"		*/
+#include <stdio.h>       /* for printf in C programs */
+#include <stdlib.h>	 /* for exit() in C programs */
+
+
+#/*##############################################
+#					 	#
+#		text segment			#
+#						#
+#################################################
+
+	.text		
+       	.globl __start 
+__start:		# execution starts here  */
+
+
+	la $a0,ans
+	li $v0,4	# print out string
+	syscall 
+
+# test for stack integrity, and preservation of s-registers	
+	li $s0,-3456	
+	move $s1, $s0
+	move $s2, $s0
+	move $s3, $s0
+	move $s4, $s0
+	move $s5, $s0
+	move $s6, $s0
+	move $s7, $s0
+	lw   $t0,psst
+	 sub $sp, $sp, 4
+	sw   $t0,($sp)	# push test value on stack
+		
+	la $a0,str
+	jal strchk	# call strchk function
+
+# do the tests	
+	lw	$t0,($sp)		#pop our test value
+	lw	$t1,psst		#it should be this
+	la	$a0, bigtrouble
+	bne	$t1,$t0,errormessage	#problem with stack or s0	
+	bne	$s0, -3456, errormessage
+	la	$a0, trouble
+	li	$t0, -3456
+	bne	$s1,$t0,errormessage	#problem with s1	
+	bne	$s2,$t0,errormessage	#...	
+	bne	$s3,$t0,errormessage	#...	
+	bne	$s4,$t0,errormessage	#...	
+	bne	$s5,$t0,errormessage	#...	
+	bne	$s6,$t0,errormessage	#...	
+	bne	$s7,$t0,errormessage	#...	
+# passed the tests	
+	move $a0,$v0
+	li $v0,1	# print out returned value
+	syscall 
+
+	la $a0,endl	# system call to print
+	li $v0,4	# out a newline
+	syscall
+
+	li $v0,10
+	syscall		# au revoir...
+errormessage:
+	li $v0,4	# out a newline
+	syscall
+
+	li $v0,10
+	syscall		# au revoir...
+
+
+#
+# checkch is a function which takes a character
+# in a0,  and returns either 0 or 1 in v0,
+# depending on the result of some test.
+# Do not rely of the particular operation performed
+# by checkch or the registers used.
+# These will be different in other mipsmark cases.
+#
+
+checkch:
+        li $v0,0
+	li $t0,-187
+	li $t1,-187
+	li $t2,-187
+	li $t3,-187
+        beq  $a0,'x',yes
+        beq  $a0,'y',yes
+        beq  $a0,'z',yes
+        jr $ra
+yes:    li $v0,1
+        jr $ra
+
+#/* Any changes above this line will be discarded by
+# mipsmark. Put your answer between dashed lines. */
+#/*-------------- start cut ----------------------- */
+
+#/*  Student's Name:		Account:		*/
+
+
+#/*  Student's Name:   Account: */
+
+strchk:
+	li $s1, 0 		# count of chars passing test (sum=0)
+	move $s5, $a0 		# s5 = string
+	move $s2, $ra 		# s2 = next operation
+
+loop: 
+	lb $s3, ($s5) 		# get current char 
+	beqz $s3, strEnd 	#check if end of string
+
+	#set up argument and call function 
+	move $a0, $s3 
+	jal checkch 
+	add $s5, $s5, 1 	# next char address
+	add $s1, $s1, $v0 	# next element j loop
+	j loop
+	
+strEnd:
+	move $v0, $s1 		# v0 = sum
+	move $ra, $s2 		# load s7 to next operation
+	jr $ra 			# go to main
+
+
+#/*
+	j __start	#nasty loop if mips program not exited */
+#/*
+	j __start	#nasty loop if mips program not exited */
+#/*--------------  end cut  -----------------------
+# Any changes below this line will be discarded by
+# mipsmark. Put your answer between dashed lines.
+
+#################################################
+#                                               #
+#               data segment                    #
+#                                               #
+#################################################
+
+        .data			#*/
+psst:	.word	0x63af11ff	# arbitrary value we keep on stack
+str:	.asciiz "axyxyxyaei0956yz\n"
+ans:	.asciiz "number of characters that pass test = "
+endl:	.asciiz "\n"
+bigtrouble:
+	.ascii  "Stack violation or "
+trouble:
+	.asciiz "s-register not preserved\n"
+#
+#/*# End of file funct7.a		*/
