@@ -1,0 +1,120 @@
+#/*# Start of file oddeven.a */
+#
+#/*# MIPSMARK 1.0 1/5/98 Copyright 1998 J. Waldron. */
+#
+/*  write a function "rearrange" that will rearrange the numbers in an array,
+	such that all the even numbers come first.
+	You may assume that the array will contain both odd and even numbers.
+    USE the function "swap" provided. It will exchange the two integer values 
+	pointed to by its two arguments. 
+	Use this in "rearrange" A goal is to minimize the number of swaps.
+    write a function "firstodd" that will return the index of the first 
+	odd number in an array
+    write a function "sum" that will sum the numbers in an array
+
+The main program will use these functions to print the sum of even numbers
+	and the sum of odd numbers. Each group of numbers may appear in any order.
+*/
+#/*# Output format must be:		*/
+#/*# "evens=100 odds=-136"		*/
+#include <stdio.h>       /* for printf in C programs */
+#include <stdlib.h>	 /* for exit() in C programs */
+
+
+#/*##############################################
+#					 	#
+#		text segment			#
+#						#
+#################################################
+
+	.text		
+       	.globl __start 
+__start:		# execution starts here  */
+
+#define LENGTH	13
+
+void rearrange	(int a[], int length);  // use swap to put even numbers first
+int  firstodd 	(const int a[], int length);  // return index of first odd number in a
+int  sum	(const int a[], int length);  // sum the numbers in a
+
+int swapcount = 0;		// initalized global
+
+void swap(int* x,int* y)	// swap the values pointed to
+{   int	temp = *x;
+	*x = *y;
+	*y = temp;
+	swapcount++;		// count how many times called
+}
+
+int main() {
+  int arr[LENGTH] = {88,-111,-1,2,-3,-4,-5,6,-7,8,-9,-2,2};
+  int fo;	// index of first odd, also number of even elements
+
+  rearrange (arr, LENGTH);     	// Student's work
+  fo = firstodd(arr, LENGTH);	// Student's work
+
+  printf("Did %d swaps\n", swapcount);
+  printf("evens=%d odds=%d\n", sum(arr, fo), sum(arr+fo, LENGTH-fo));
+  return 0;
+}
+
+  
+
+#/* Any changes above this line will be discarded by
+# mipsmark. Put your answer between dashed lines. */
+#/*-------------- start cut ----------------------- */
+
+#/*  Student's Name:		Account:		*/
+
+
+void rearrange(int a[], int length) {
+
+    int l = 0;
+    int r = length - 1;
+    while (l < r) {
+        while (a[l] % 2 == 0 && l < r) {
+            l++;
+        }
+        while (a[r] % 2 == 1 && l < r) {
+            r--;
+        }
+        if (l < r) {
+            swap( & a[l], & a[r]);
+            l++;
+            r--;
+        }
+    }
+}
+
+int firstodd(const int a[], int length) {
+    int i;
+    for (i = 0; i < length; i++) {
+        if (a[i] % 2 != 0)
+            break;
+    }
+    return i;
+}
+
+int sum(const int a[], int length) {
+    int i = 0, sum = 0;
+    for (i = 0; i < length; i++) {
+        sum += a[i];
+    }
+    return sum;
+}
+
+#/*
+	j __start	#nasty loop if mips program not exited */
+#/*--------------  end cut  -----------------------
+# Any changes below this line will be discarded by
+# mipsmark. Put your answer between dashed lines.
+
+#################################################
+#                                               #
+#               data segment                    #
+#                                               #
+#################################################
+
+        .data			#*/
+#
+#/*# End of file oddeven.a		*/
