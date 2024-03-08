@@ -1,0 +1,103 @@
+#/*# Start of file bits.a */
+#
+#/*# MIPSMARK 1.0 1/5/98 Copyright 1998 J. Waldron. */
+#
+## Question:
+##  change the case of all letters in the string "ans"
+## simplifying assumption: All characters >='A' are letters
+##  (no test cases will use {}[], etc)
+## Divide "number" by 32, using shift, not div
+##
+## Then print "ans" followed by "number" and a newline 
+#/*# Output format must be:		*/
+#/*# "num Divided By 32 = -1024"		*/
+
+#/*################################################
+#					 	#
+#		text segment			#
+#						#
+#################################################
+
+	.text		
+       	.globl __start 
+__start:		# execution starts here  */
+
+
+#/* Any changes above this line will be discarded by
+# mipsmark. Put your answer between dashed lines.
+#-------------- start cut -----------------------
+
+#  Student:		Account: 		*/
+
+
+
+lw $t0, number		# t0 = number
+sra $t1, $t0, 5		# t1 = shift contensts of t0 by 5 (32 = 2^5)
+
+li $t2, 97		# ASCII = a
+move $s0, $t2		# s0 = 97
+
+li $t2, 122		# ASCII = z
+move $s1, $t2		# s1 = 122
+
+li $t2, 65		# ASCII = A
+move $s2, $t2		# s2 = 65
+
+li $t2, 90		# ASCII = Z
+move $s3, $t2		# s3 = 90
+
+li $t3, 0
+li $t4, 32
+
+loop:
+lb $t5, ans($t3)
+beqz $t5, print		# if end of string ( = 0), print
+blt $t5, $s2, lowercase	# if t5 < 65, go to lowercase
+bgt $t5, $s3, lowercase	# if t5 > 90, go to lowercase
+add $t5, $t5, $t4
+j save
+
+lowercase:
+blt $t5, $s0, save  	# if t5 < 97, go to save
+bgt $t5, $s1, save	# if t5 > 122, go to save
+xor $t5, $t5, $t4
+
+save:
+sb $t5, ans($t3)	# store char
+add $t3, $t3, 1		# index ++
+j loop
+
+print:
+la $a0, ans		# print "NUM dIVIDED bY 32"
+li $v0, 4
+syscall
+
+move $a0, $t1		# print divided number
+li $v0, 1
+syscall
+
+la $a0, endl		# print endl
+li $v0, 4
+syscall
+
+li $v0, 10		# au revoir
+syscall
+
+
+#/*--------------  end cut  -----------------------
+# Any changes below this line will be discarded by
+# mipsmark. Put your answer between dashed lines.
+
+#################################################
+#                                               #
+#               data segment                    #
+#                                               #
+#################################################
+
+        .data			#*/
+number:	.word -32760
+ans:	.asciiz	"NUM dIVIDED bY 32 = "
+endl:	.asciiz "\n"
+
+#
+#/*# End of file bits.a		*/
